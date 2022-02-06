@@ -1,7 +1,5 @@
 # JPDesignCodeCourse
 
-Github：[JPDesignCodeCourse](https://github.com/Rogue24/JPDesignCodeCourse)
-
 我的SwiftUI学习项目，学自于国外很出名的一个SwiftUI课程：[DesignCode](https://designcode.io/)。（这是收费的课程，当然也可以从其他渠道获取该资源，例如某第一或第二字母站...）
 
 这是第二篇，上一篇是`SwiftUI 1.0`的项目：[JPDesignCode](https://github.com/Rogue24/JPDesignCode)
