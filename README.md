@@ -11,7 +11,7 @@ PS：该 Project 是属于`SwiftUI 2.0`时期的课程（Part1部分），现在
 该 Project 中`SwiftUI`主要用到以下技术：
 - LazyVGrid/LazyHGrid
 - MatchedGeometryEffect 匹配几何效果
-- LibraryContent 快捷插入菜单（快捷键：Command + Shift + L），添加可重用`Views`和`Modifier`
+- LibraryContent 快捷插入菜单（快捷键：Command + Shift + L），添加可重用的`View`和`Modifier`
 - 小组件的基本搭建
 - 如何一套代码兼容iOS、iPad、Mac三端
 等等等等...

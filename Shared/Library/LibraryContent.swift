@@ -4,7 +4,7 @@
 //
 //  Created by 周健平 on 2022/2/6.
 //
-//  @LibraryContentBuilder：将可重用`Views`和`Modifier`添加到`LibraryContent`
+//  @LibraryContentBuilder：将可重用的`View`和`Modifier`添加到`LibraryContent`
 //  LibraryContent：快捷插入菜单（快捷键：Command + Shift + L）
 
 import SwiftUI
