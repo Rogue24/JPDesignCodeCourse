@@ -34,6 +34,8 @@ struct CoursesView: View {
     @State var isDisabled = false
     
     #if os(iOS)
+    @Binding var isActives: [Bool]
+    var logMsg: (() -> ())? = nil
     // SizeClass只适用于iOS和iPadOS
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     #else
@@ -47,17 +49,23 @@ struct CoursesView: View {
 //            content
 //                .navigationBarHidden(true)
             if horizontalSizeClass == .compact {
-                tabBar
+                tabBar.onAppear { print("紧凑型") }
             } else {
-                sidebar
+                sidebar.onAppear { print("常用型") }
             }
             
-            detailContent
-                .background(
-                    // 只有iOS/iPadOS才可以设置blurStyle
-                    VisualEffectBlur(blurStyle: .systemMaterial)
-                        .edgesIgnoringSafeArea(.all)
-                )
+            if #available(iOS 15.0, *) {
+                // 在最新的iOS15.2的iPadOS用VisualEffectBlur会崩溃！！！
+                detailContent
+                    .background(.black.opacity(0.2))
+            } else {
+                detailContent
+                    .background(
+                        // 只有iOS/iPadOS才可以设置blurStyle
+                        VisualEffectBlur(blurStyle: .systemMaterial)
+                            .edgesIgnoringSafeArea(.all)
+                    )
+            }
             #else
             // 除了iOS/iPadOS，那就是MacOS了
             content
@@ -120,6 +128,7 @@ struct CoursesView: View {
                                 .onTapGesture {
                                     // 使用withAnimation就可以实现【仅在点击时】才添加动画
                                     withAnimation(.spring(response: 0.5, dampingFraction: 0.7, blendDuration: 0)) {
+                                        print("点了打开 \(course.id)")
                                         show = true
                                         selectedItem = course
                                         isDisabled = true
@@ -128,7 +137,7 @@ struct CoursesView: View {
                                 .disabled(isDisabled) // 防止铺满全屏的过程中点击了其他卡片造成错乱，点击后禁止卡片列表的交互
                         }
                         // 将【点击的CourseItem】和【弹出的ScrollView】都使用`VStack`作为其容器，对其添加匹配几何效果，这样就能实现头部及其列表的过渡效果，并且互不影响
-                        .matchedGeometryEffect(id: "container\(course.id)", in: namespace, isSource: !show)
+                        .matchedGeometryEffect(id: "container_\(course.id)", in: namespace, isSource: !show)
                     }
                 }
                 .padding(16) // 外间距
@@ -197,6 +206,7 @@ struct CoursesView: View {
                     .onTapGesture {
                         // 使用withAnimation就可以实现【仅在点击时】才添加动画
                         withAnimation(.spring()) {
+                            print("点了关闭 \(selectedItem!.id)")
                             show = false
                             selectedItem = nil
                             // 防止返回卡片的过程中点击了其他卡片造成错乱，延时处理让动画完整进行后再开启卡片列表的交互
@@ -271,19 +281,33 @@ struct CoursesView: View {
         #if os(iOS)
         NavigationView {
             List {
-                NavigationLink(destination: content) {
+                NavigationLink(isActive: $isActives[0]) {
+                    content
+                } label: {
                     Label("Courses", systemImage: "book.closed")
                 }
-                NavigationLink(destination: content) {
+                
+                NavigationLink(isActive: $isActives[1]) {
+                    CourseList()
+                } label: {
                     Label("Tutorials", systemImage: "list.bullet.rectangle")
                 }
-                NavigationLink(destination: content) {
+                
+                NavigationLink(isActive: $isActives[2]) {
+                    CourseList()
+                } label: {
                     Label("Livestreams", systemImage: "tv")
                 }
-                NavigationLink(destination: content) {
+                
+                NavigationLink(isActive: $isActives[3]) {
+                    CourseList()
+                } label: {
                     Label("Certificates", systemImage: "mail.stack")
                 }
-                NavigationLink(destination: content) {
+                
+                NavigationLink(isActive: $isActives[4]) {
+                    CourseList()
+                } label: {
                     Label("Search", systemImage: "magnifyingglass")
                 }
             }
@@ -292,11 +316,26 @@ struct CoursesView: View {
             .toolbar {
                 // 默认是顶部靠右的工具栏 navigationBarTrailing
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Image(systemName: "person.crop.circle")
+//                    Image(systemName: "person.crop.circle")
+                    Button(action: {
+                        logMsg?()
+                    }) {
+                        Image(systemName: "person.crop.circle")
+                    }
                 }
             }
             
-            content
+            // 由于iPad和Mac端屏幕更大，所以需要一个默认初始页面
+            // iPad端的侧边栏：竖屏时是抽屉式（隐藏/推出），横屏时一直占据左边
+            // Mac端的侧边栏：一直占据左边
+            // 这里是给iPad和Mac端【右侧区域】设置初始内容：
+//            content
+            // 经测试，这里设置的初始内容，跟NavigationLink.destination根本不是同一个，这样会导致点击展开详情出现错乱
+            // 因此使用系统推荐方式：放一个选择前的占位视图
+            Text("Select a Course.")
+                .onTapGesture {
+                    logMsg?()
+                }
         }
         #endif
     }
@@ -304,6 +343,10 @@ struct CoursesView: View {
 
 struct CoursesView_Previews: PreviewProvider {
     static var previews: some View {
+        #if os(iOS)
+        CoursesView(isActives: .constant(Array(repeating: false, count: 5)))
+        #else
         CoursesView()
+        #endif
     }
 }

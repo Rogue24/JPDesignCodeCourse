@@ -8,10 +8,13 @@
 import SwiftUI
 
 struct TabBar: View {
+    @Binding var isActives: [Bool]
+    var logMsg: (() -> ())? = nil
+    
     var body: some View {
         TabView {
             NavigationView {
-                CoursesView()
+                CoursesView(isActives: $isActives, logMsg: logMsg)
             }
             .tabItem {
                 Image(systemName: "book.closed")
@@ -55,6 +58,6 @@ struct TabBar: View {
 
 struct TabBar_Previews: PreviewProvider {
     static var previews: some View {
-        TabBar()
+        TabBar(isActives: .constant(Array(repeating: false, count: 5)))
     }
 }

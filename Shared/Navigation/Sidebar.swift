@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct Sidebar: View {
+    @Binding var isActives: [Bool]
+    var logMsg: (() -> ())? = nil
+    
     var body: some View {
         NavigationView {
             #if os(iOS)
@@ -29,7 +32,7 @@ struct Sidebar: View {
                 .toolbar {
                     ToolbarItem(placement: .automatic) {
                         Button(action: {
-                            
+                            logMsg?()
                         }) {
                             Image(systemName: "person.crop.circle")
                         }
@@ -40,26 +43,54 @@ struct Sidebar: View {
             // 由于iPad和Mac端屏幕更大，所以需要一个默认初始页面
             // iPad端的侧边栏：竖屏时是抽屉式（隐藏/推出），横屏时一直占据左边
             // Mac端的侧边栏：一直占据左边
-            // 这里是给iPad和Mac端设置初始内容：
-            CoursesView()
+            // 这里是给iPad和Mac端【右侧区域】设置初始内容：
+//            #if os(iOS)
+//            CoursesView(isActives: $isActives)
+//            #else
+//            CoursesView()
+//            #endif
+            // 经测试，这里设置的初始内容，跟NavigationLink.destination根本不是同一个，这样会导致点击展开详情出现错乱
+            // 因此使用系统推荐方式：放一个选择前的占位视图
+            Text("Select a Course.")
+                .onTapGesture {
+                    logMsg?()
+                }
         }
     }
     
     var content: some View {
         List {
-            NavigationLink(destination: CoursesView()) {
+            NavigationLink(isActive: $isActives[0]) {
+                #if os(iOS)
+                CoursesView(isActives: $isActives)
+                #else
+                CoursesView()
+                #endif
+            } label: {
                 Label("Courses", systemImage: "book.closed")
             }
-            NavigationLink(destination: CourseList()) {
+            
+            NavigationLink(isActive: $isActives[1]) {
+                CourseList()
+            } label: {
                 Label("Tutorials", systemImage: "list.bullet.rectangle")
             }
-            NavigationLink(destination: CourseList()) {
+            
+            NavigationLink(isActive: $isActives[2]) {
+                CourseList()
+            } label: {
                 Label("Livestreams", systemImage: "tv")
             }
-            NavigationLink(destination: CourseList()) {
+            
+            NavigationLink(isActive: $isActives[3]) {
+                CourseList()
+            } label: {
                 Label("Certificates", systemImage: "mail.stack")
             }
-            NavigationLink(destination: CourseList()) {
+            
+            NavigationLink(isActive: $isActives[4]) {
+                CourseList()
+            } label: {
                 Label("Search", systemImage: "magnifyingglass")
             }
         }
@@ -69,6 +100,6 @@ struct Sidebar: View {
 
 struct Sidebar_Previews: PreviewProvider {
     static var previews: some View {
-        Sidebar()
+        Sidebar(isActives: .constant(Array(repeating: false, count: 5)))
     }
 }

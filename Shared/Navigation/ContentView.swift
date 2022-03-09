@@ -14,6 +14,11 @@ struct ContentView: View {
 //    @Environment(\.horizontalSizeClass) var horizontalSizeClass
 //    #endif
     
+    @State var isActives: [Bool] = Array(repeating: false, count: 5)
+    func logMsg() {
+        print("isActives: \(isActives)")
+    }
+    
     var body: some View {
         #if os(iOS)
         //【在iOS和iPadOS中，CoursesView内部自己使用和维护TabBar和Sidebar】
@@ -23,9 +28,9 @@ struct ContentView: View {
 //        } else {
 //            Sidebar()
 //        }
-        CoursesView()
+        CoursesView(isActives: $isActives, logMsg: logMsg)
         #else
-        Sidebar()
+        Sidebar(isActives: $isActives, logMsg: logMsg)
             .frame(minWidth: 1000, // 最小宽度
                    minHeight: 600) // 最小高度
         #endif

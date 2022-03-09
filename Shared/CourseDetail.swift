@@ -62,7 +62,7 @@ struct CourseDetail: View {
         .background(Color("Background 1"))
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         // 将【点击的CourseItem】和【弹出的ScrollView】都使用`VStack`作为其容器，对其添加匹配几何效果，这样就能实现头部及其列表的过渡效果，并且互不影响
-        .matchedGeometryEffect(id: "container\(course.id)", in: namespace)
+        .matchedGeometryEffect(id: "container_\(course.id)", in: namespace)
         // 使用了`matchedGeometryEffect`就不需要下面`延时transition`的操作了
 //        .transition(.move(edge: .leading)) 从哪里开始显示，隐藏时就回去哪里
 //        .transition(
@@ -80,6 +80,9 @@ struct CourseDetail: View {
 //                        .animation(.spring())
 //            )
 //        )
+        .onAppear {
+            print("my namespace: \(namespace)")
+        }
     }
 }
 
